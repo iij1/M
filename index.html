@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>أساسيات الحاسب والبرمجة C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --surface3: #30363d;
+    --border: #30363d;
+    --accent: #00d4aa;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --nav-h: 68px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    padding-bottom: var(--nav-h);
+  }
+
+  /* ── TOP HEADER ── */
+  .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .top-bar h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .top-bar .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(22,27,34,0.97);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    border: none;
+    background: none;
+    color: var(--text3);
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .nav-btn .icon { font-size: 22px; transition: transform 0.2s; }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn.active .icon { transform: scale(1.1); }
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 20px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 16px; animation: fadeIn 0.25s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HOME PAGE ── */
+  .hero {
+    background: linear-gradient(135deg, #0d2a20 0%, #0d1117 50%, #1a0d2e 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 60% 40%, rgba(0,212,170,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 70%, rgba(124,58,237,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-icon { font-size: 48px; margin-bottom: 12px; }
+  .hero h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+  .hero p { color: var(--text2); font-size: 13px; line-height: 1.6; }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 24px; font-weight: 900; color: var(--accent); }
+  .stat-card .lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* Quick Actions */
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Cairo', sans-serif;
+    color: var(--text);
+    text-align: right;
+  }
+  .action-card:active { transform: scale(0.97); }
+  .action-card .ac-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .action-card .ac-title { font-size: 13px; font-weight: 700; }
+  .action-card .ac-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .action-card.primary { border-color: var(--accent); background: rgba(0,212,170,0.06); }
+  .action-card.primary .ac-icon { background: rgba(0,212,170,0.15); }
+  .action-card.purple { border-color: var(--accent2); background: rgba(124,58,237,0.06); }
+  .action-card.purple .ac-icon { background: rgba(124,58,237,0.15); }
+
+  /* Toggle switches */
+  .toggle-section { margin-bottom: 20px; }
+  .toggle-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .toggle-row .info { flex: 1; }
+  .toggle-row .info .t { font-size: 14px; font-weight: 600; }
+  .toggle-row .info .s { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .toggle {
+    width: 50px;
+    height: 28px;
+    background: var(--surface3);
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    right: 3px;
+    transition: transform 0.25s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .toggle.on::after { transform: translateX(-22px); }
+
+  /* ── EXAM MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    backdrop-filter: blur(4px);
+    align-items: flex-end;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-sheet {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    border: 1px solid var(--border);
+    padding: 24px 20px 32px;
+    width: 100%;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; text-align: center; }
+  .modal-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 24px; }
+  .modal-info-row { display: flex; gap: 10px; margin-bottom: 24px; }
+  .modal-info-box {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .modal-info-box .v { font-size: 22px; font-weight: 800; color: var(--accent3); }
+  .modal-info-box .l { font-size: 11px; color: var(--text2); }
+  .btn-start {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #0d1117;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: opacity 0.2s;
+  }
+  .btn-start:active { opacity: 0.85; }
+  .btn-cancel {
+    width: 100%;
+    padding: 14px;
+    background: var(--surface2);
+    color: var(--text2);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  /* ── QUIZ PAGE ── */
+  #quiz-page { padding: 0; }
+  .quiz-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .q-counter { font-size: 13px; color: var(--text2); }
+  .q-counter span { color: var(--text); font-weight: 700; }
+  .timer-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Fira Code', monospace;
+  }
+  .timer-box.warn { border-color: var(--accent3); color: var(--accent3); }
+  .timer-box.danger { border-color: var(--danger); color: var(--danger); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .quiz-body { padding: 20px 16px; }
+  .q-number-badge {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-family: 'Fira Code', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    position: relative;
+    border-right: 3px solid var(--accent2);
+    direction: ltr;
+  }
+  .code-block .kw { color: #ff7b72; }
+  .code-block .ty { color: #79c0ff; }
+  .code-block .st { color: #a5d6ff; }
+  .code-block .nm { color: #d2a8ff; }
+  .code-block .op { color: #8b949e; }
+  .code-block .cm { color: #6e7681; font-style: italic; }
+
+  .options-list { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: right;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn:active { transform: scale(0.99); }
+  .option-btn .opt-letter {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'Fira Code', monospace;
+    direction: ltr;
+  }
+  .option-btn .opt-text { flex: 1; line-height: 1.5; }
+  .option-btn:hover { border-color: var(--accent); background: rgba(0,212,170,0.04); }
+  .option-btn.selected { border-color: var(--accent2); background: rgba(124,58,237,0.1); }
+  .option-btn.selected .opt-letter { background: var(--accent2); border-color: var(--accent2); color: white; }
+  .option-btn.correct { border-color: var(--success); background: rgba(34,197,94,0.1); }
+  .option-btn.correct .opt-letter { background: var(--success); border-color: var(--success); color: white; }
+  .option-btn.wrong { border-color: var(--danger); background: rgba(239,68,68,0.1); }
+  .option-btn.wrong .opt-letter { background: var(--danger); border-color: var(--danger); color: white; }
+  .option-btn.disabled { pointer-events: none; }
+
+  .feedback-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback-box.correct { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+  .feedback-box.wrong { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+
+  .quiz-footer {
+    padding: 16px;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .btn-next, .btn-prev {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-next { background: var(--accent); color: #0d1117; }
+  .btn-next:disabled { background: var(--surface2); color: var(--text3); cursor: default; }
+  .btn-prev { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-next:active:not(:disabled), .btn-prev:active { transform: scale(0.98); }
+
+  /* ── RESULTS PAGE ── */
+  #result-page { display: none; padding: 16px; }
+  #result-page.show { display: block; }
+  .result-hero {
+    background: linear-gradient(135deg, #0d2a20 0%, #0d1117 60%, #1a0d2e 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-emoji { font-size: 56px; margin-bottom: 10px; }
+  .result-grade { font-size: 48px; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
+  .result-label { font-size: 14px; color: var(--text2); }
+  .result-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .rs-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; }
+  .rs-card .rv { font-size: 22px; font-weight: 800; }
+  .rs-card .rl { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+  /* Review list */
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .review-item.wrong-item { border-right: 3px solid var(--danger); }
+  .review-item.right-item { border-right: 3px solid var(--success); }
+  .review-q { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+  .review-ans { font-size: 13px; }
+  .review-item .correct-ans { color: var(--success); font-size: 12px; margin-top: 4px; }
+
+  .btn-retry {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #0d1117;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-top: 16px;
+  }
+  .btn-home {
+    width: 100%;
+    padding: 14px;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  /* ── BROWSE PAGE ── */
+  .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    gap: 10px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--accent); }
+  .search-box input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    direction: rtl;
+  }
+  .search-box input::placeholder { color: var(--text3); }
+  .search-icon { color: var(--text3); font-size: 16px; }
+
+  .browse-q {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .browse-q:hover { border-color: var(--accent); }
+  .browse-q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .browse-q-num { font-size: 11px; font-weight: 700; color: var(--accent); font-family: 'Fira Code', monospace; }
+  .browse-q-page { font-size: 11px; color: var(--text3); }
+  .browse-q-text { font-size: 13px; line-height: 1.6; color: var(--text2); }
+  .browse-q.expanded .browse-q-text { color: var(--text); }
+  .browse-q-answer { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .browse-q.expanded .browse-q-answer { display: block; }
+  .answer-tag { display: inline-block; background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+
+  /* Chip filters */
+  .filter-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+  .filter-chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    transition: all 0.15s;
+  }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: #0d1117; }
+
+  /* ── SETTINGS PAGE ── */
+  .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .sr-info { flex: 1; }
+  .settings-row .sr-title { font-size: 14px; font-weight: 600; }
+  .settings-row .sr-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .settings-row select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    padding: 6px 10px;
+    outline: none;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+
+  /* Code inside option */
+  .opt-code {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    direction: ltr;
+    display: inline-block;
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div>
+    <h1>🖥️ C++ أساسيات البرمجة</h1>
+  </div>
+  <div class="badge" id="score-badge">0 / 0 ✓</div>
+</div>
+
+<!-- PAGES -->
+<div class="page active" id="home-page">
+  <div class="hero">
+    <div class="hero-icon">🎓</div>
+    <h2>اختبر نفسك في C++</h2>
+    <p>أسئلة شاملة من أساسيات البرمجة، شروط، حلقات، مصفوفات، دوال، كلاسات والمزيد</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num">225</div>
+      <div class="lbl">سؤال</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="home-done">0</div>
+      <div class="lbl">أُجيب عليه</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="home-acc">—</div>
+      <div class="lbl">دقة %</div>
+    </div>
+  </div>
+
+  <div class="section-title">إعدادات الأسئلة</div>
+  <div class="toggle-section">
+    <div class="toggle-row">
+      <div class="info">
+        <div class="t">🔀 ترتيب الأسئلة عشوائي</div>
+        <div class="s">يخلط ترتيب الأسئلة في كل جلسة</div>
+      </div>
+      <button class="toggle on" id="toggle-q-order" onclick="toggleSwitch(this,'shuffleQ')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="info">
+        <div class="t">🎲 ترتيب الإجابات عشوائي</div>
+        <div class="s">يخلط خيارات الإجابة لكل سؤال</div>
+      </div>
+      <button class="toggle on" id="toggle-a-order" onclick="toggleSwitch(this,'shuffleA')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="info">
+        <div class="t">💡 إظهار الإجابة فوراً</div>
+        <div class="s">تظهر الإجابة الصحيحة بعد اختيارك</div>
+      </div>
+      <button class="toggle on" id="toggle-instant" onclick="toggleSwitch(this,'instantFeedback')"></button>
+    </div>
+  </div>
+
+  <div class="section-title">ابدأ الآن</div>
+  <div class="action-grid">
+    <div class="action-card primary" onclick="openExamModal()">
+      <div class="ac-icon">⚡</div>
+      <div>
+        <div class="ac-title">اختبار موقوت</div>
+        <div class="ac-sub">30 سؤال · 40 دقيقة</div>
+      </div>
+    </div>
+    <div class="action-card purple" onclick="startPractice()">
+      <div class="ac-icon">📖</div>
+      <div>
+        <div class="ac-title">تدريب حر</div>
+        <div class="ac-sub">جميع الأسئلة</div>
+      </div>
+    </div>
+    <div class="action-card" onclick="startMissed()" style="border-color:#ef4444;background:rgba(239,68,68,0.05)">
+      <div class="ac-icon" style="background:rgba(239,68,68,0.15)">❌</div>
+      <div>
+        <div class="ac-title">أسئلتي الخاطئة</div>
+        <div class="ac-sub" id="missed-count">0 سؤال</div>
+      </div>
+    </div>
+    <div class="action-card" onclick="goTo('browse-page')" style="border-color:#f59e0b;background:rgba(245,158,11,0.05)">
+      <div class="ac-icon" style="background:rgba(245,158,11,0.15)">🔍</div>
+      <div>
+        <div class="ac-title">تصفح الأسئلة</div>
+        <div class="ac-sub">مع الإجابات</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page" id="quiz-page">
+  <div class="quiz-header">
+    <div class="quiz-meta">
+      <div class="q-counter">سؤال <span id="q-current">1</span> / <span id="q-total">30</span></div>
+      <div class="timer-box" id="timer-box">
+        <span>⏱</span>
+        <span id="timer-display">40:00</span>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="q-progress" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="quiz-body" id="quiz-body">
+    <!-- question rendered here -->
+  </div>
+
+  <div class="quiz-footer">
+    <button class="btn-prev" id="btn-prev" onclick="prevQ()">→ السابق</button>
+    <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>التالي ←</button>
+  </div>
+</div>
+
+<!-- RESULTS PAGE -->
+<div id="result-page">
+  <div class="result-hero">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-grade" id="result-grade">0%</div>
+    <div class="result-label" id="result-label">انتهى الاختبار</div>
+  </div>
+  <div class="result-stats">
+    <div class="rs-card">
+      <div class="rv" id="rs-correct" style="color:var(--success)">0</div>
+      <div class="rl">صحيح ✓</div>
+    </div>
+    <div class="rs-card">
+      <div class="rv" id="rs-wrong" style="color:var(--danger)">0</div>
+      <div class="rl">خطأ ✗</div>
+    </div>
+    <div class="rs-card">
+      <div class="rv" id="rs-skip" style="color:var(--text2)">0</div>
+      <div class="rl">متخطى</div>
+    </div>
+  </div>
+
+  <div class="section-title">مراجعة الأسئلة</div>
+  <div id="review-list"></div>
+
+  <button class="btn-retry" onclick="retryExam()">🔄 أعد الاختبار</button>
+  <button class="btn-home" onclick="goHome()">🏠 الرئيسية</button>
+</div>
+
+<!-- BROWSE PAGE -->
+<div class="page" id="browse-page">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="ابحث في الأسئلة..." id="search-input" oninput="filterBrowse()">
+  </div>
+  <div class="filter-chips" id="filter-chips">
+    <div class="chip active" onclick="setChip(this,'all')">الكل</div>
+    <div class="chip" onclick="setChip(this,'basics')">الأساسيات</div>
+    <div class="chip" onclick="setChip(this,'conditions')">الشروط</div>
+    <div class="chip" onclick="setChip(this,'loops')">الحلقات</div>
+    <div class="chip" onclick="setChip(this,'arrays')">المصفوفات</div>
+    <div class="chip" onclick="setChip(this,'functions')">الدوال</div>
+    <div class="chip" onclick="setChip(this,'strings')">النصوص</div>
+    <div class="chip" onclick="setChip(this,'pointers')">المؤشرات</div>
+    <div class="chip" onclick="setChip(this,'structs')">الهياكل</div>
+    <div class="chip" onclick="setChip(this,'classes')">الكلاسات</div>
+  </div>
+  <div id="browse-list"></div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div class="page" id="settings-page">
+  <div class="section-title">إعدادات الاختبار</div>
+  <div class="settings-card">
+    <div class="settings-row">
+      <div class="sr-info">
+        <div class="sr-title">عدد أسئلة الاختبار</div>
+        <div class="sr-sub">عدد الأسئلة في كل اختبار موقوت</div>
+      </div>
+      <select id="set-qcount" onchange="settings.examCount=+this.value;saveSettings()">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30" selected>30</option>
+        <option value="50">50</option>
+        <option value="225">الكل</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <div class="sr-info">
+        <div class="sr-title">مدة الاختبار (دقيقة)</div>
+        <div class="sr-sub">الوقت المخصص للاختبار الموقوت</div>
+      </div>
+      <select id="set-time" onchange="settings.examTime=+this.value;saveSettings()">
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40" selected>40</option>
+        <option value="60">60</option>
+        <option value="0">بلا حد</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-title">التقدم</div>
+  <div class="settings-card">
+    <div class="settings-row">
+      <div class="sr-info">
+        <div class="sr-title">حذف السجل</div>
+        <div class="sr-sub">إعادة ضبط جميع الإحصائيات والأسئلة الخاطئة</div>
+      </div>
+      <button onclick="resetProgress()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger);padding:8px 14px;border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;cursor:pointer">حذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM MODAL -->
+<div class="modal-overlay" id="exam-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚡ اختبار موقوت</div>
+    <div class="modal-sub">اختبر معلوماتك بأسئلة عشوائية مع مؤقت</div>
+    <div class="modal-info-row">
+      <div class="modal-info-box">
+        <div class="v" id="modal-qcount">30</div>
+        <div class="l">سؤال</div>
+      </div>
+      <div class="modal-info-box">
+        <div class="v" id="modal-time">40</div>
+        <div class="l">دقيقة</div>
+      </div>
+      <div class="modal-info-box">
+        <div class="v">عشوائي</div>
+        <div class="l">ترتيب</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="startExam()">🚀 ابدأ الاختبار</button>
+    <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="goTo('home-page')">
+    <span class="icon">🏠</span>
+    <span>الرئيسية</span>
+  </button>
+  <button class="nav-btn" id="nav-quiz" onclick="goTo('quiz-page')">
+    <span class="icon">✏️</span>
+    <span>الاختبار</span>
+  </button>
+  <button class="nav-btn" id="nav-browse" onclick="goTo('browse-page')">
+    <span class="icon">📚</span>
+    <span>الأسئلة</span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="goTo('settings-page')">
+    <span class="icon">⚙️</span>
+    <span>الإعدادات</span>
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA — All 225 Questions
+// ═══════════════════════════════════════════════
+const RAW_QUESTIONS = [
+  // PAGE 2
+  {id:1,page:"الأساسيات",q:"يقوم المترجم بترجمة الأوامر البرمجية المكتوبة بلغة C++ إلى أوامر بلغة:",opts:["التجميع","الآلة","عالية المستوى","الإنسان"],ans:1},
+  {id:2,page:"الأساسيات",q:"تعتبر لغة C++ من اللغات:",opts:["عالية المستوى","متوسطة المستوى","منخفضة المستوى","كل العبارات خطأ"],ans:0},
+  {id:3,page:"الأساسيات",q:"الخطوة الأولى عند كتابة أي برنامج بلغة C++ هي:",opts:["كتابة خوارزمية لحل المهمة","كتابة البرنامج مباشرة","فهم المهمة وتحديد المتطلبات الأساسية المطلوبة","كتابة البرنامج بلغة منخفضة المستوى"],ans:2},
+  {id:4,page:"الأساسيات",q:"أي مما يلي لا يصلح كاسم لمتغير؟",opts:["int3","X10","float","Man_2"],ans:2,code:null},
+  {id:5,page:"الأساسيات",q:"حجم المتغير المنطقي bool هو:",opts:["4 بت","بايت واحد","32 بايت","بت واحد"],ans:1},
+  // PAGE 3
+  {id:6,page:"الأساسيات",q:"الأوامر والتعليمات في لغة C++ تنتهي دائماً بـ:",opts:["نقطة","فاصلة منقوطة ;","فاصلة","حرف استفهام"],ans:1},
+  {id:7,page:"الأساسيات",q:"أي مما يلي يعرّف متغيراً من نوع عدد حقيقي؟",opts:["int x","float x","long int x","char x"],ans:1},
+  {id:8,page:"الأساسيات",q:'ماذا يتم طباعته عند تنفيذ:\ncout << "University\\rThee";',code:'cout << "University\\rThee";',opts:["University/rThee",'"University/rThee"',"University Thee","Theeersity"],ans:3},
+  {id:9,page:"الأساسيات",q:'هل الأمر التالي يطبع كلمة University؟\n// cout << "University";',code:'// cout << "University";',opts:["نعم","خطأ (لا يطبع)","أحياناً","يعتمد"],ans:1},
+  // PAGE 4
+  {id:10,page:"الأساسيات",q:'إذا كانت قيمة x = 2 وتم تنفيذ:\nz = ++x\nقيمة z هي:',code:'int x = 2;\nz = ++x;',opts:["2","3","1","4"],ans:1},
+  {id:11,page:"الأساسيات",q:"لإدخال x و y من لوحة المفاتيح الأمر الصحيح هو:",opts:["cin<<x,y;","cin>>x>>y;","cin>>x,y;","cin<<x<<y;"],ans:1},
+  {id:12,page:"الأساسيات",q:"لإيجاد حاصل ضرب 3 × 2 في C++:",opts:["2*3","3×2","2.3","3+2"],ans:0},
+  {id:13,page:"الأساسيات",q:"ناتج العملية: (4 + 6) / 2 + 2",code:"(4 + 6) / 2 + 2",opts:["6","7","11","3.5"],ans:1},
+  {id:14,page:"الأساسيات",q:"ناتج العملية: 3 & 7",code:"3 & 7",opts:["3","7","4","6"],ans:0},
+  // PAGE 5
+  {id:15,page:"الأساسيات",q:"أي العمليات التالية تنفذ أولاً في التعبير: 1 - 2 * 4 / 3 + 2",code:"1 - 2 * 4 / 3 + 2",opts:["4*2","2-1","2+3","2*4"],ans:3},
+  {id:16,page:"الأساسيات",q:"ناتج العملية: (int) 6.8 / 2",code:"(int) 6.8 / 2",opts:["3.4","3","5.3","4"],ans:1},
+  {id:17,page:"الأساسيات",q:"ناتج العملية: (10 > 2) || (2 > 10)",code:"(10 > 2) || (2 > 10)",opts:["True","False","2","10"],ans:0},
+  {id:18,page:"الأساسيات",q:"ناتج العملية: (double)(9 / 2)",code:"(double)(9 / 2)",opts:["4.0","4.5","5.0","0.5"],ans:0},
+  // PAGE 5b - if/else
+  {id:19,page:"الشروط",q:'عند تنفيذ الأمر البرمجي التالي، "Hello" ستطبع:',code:'if (2)\n    cout << "Hello";',opts:["دائماً","لن تطبع أبداً","أحياناً","الأمر خطأ"],ans:0},
+  {id:20,page:"الشروط",q:'ما هي قيمة X التي تسمح للبرنامج بطباعة "END"؟',code:'if (5 >= x)\n    cout << "Hello";\nelse\n    cout << "End";',opts:["3","5","6","0"],ans:2},
+  {id:21,page:"الشروط",q:'في البرنامج التالي، كلمة "Equal" ستظهر على الشاشة:',code:'if (x =< 100)\n    cout << "More";\nelse {\n    cout << "Less";\n    cout << "Equal";\n}',opts:["دائماً","إذا كانت قيمة X أكبر أو تساوي 100","لن تظهر","إذا كانت قيمة X أقل أو تساوي 100"],ans:0},
+  {id:22,page:"الشروط",q:"ماذا سيطبع الجزء التالي من البرنامج عند تنفيذه؟",code:'int x = 3;\ncout << (x > 3 ? "Number" : "Character");\nreturn 0;',opts:["Number","Character","لن يطبع أي شيء","خطأ برمجي"],ans:1},
+  {id:23,page:"الشروط",q:'ما هو الشرط الواجب تحققه حتى يتم طباعة "Pass" على الشاشة؟',code:'if (x < 1)\n    if (y > 10) cout << "Pass";\n    else cout << "Fail";',opts:["أن تكون x أكبر من 1","أن تكون y أكبر من 10","أن تكون x أقل من 1 و y أكبر من 10","أن تكون x أقل من 1 أو y أكبر من 10"],ans:2},
+  // PAGE 6
+  {id:24,page:"الشروط",q:'متى يتم طباعة كلمة "Fail" على الشاشة؟',code:'if (x > 5)\n    if (y <= 10) cout << "Pass";\n    else cout << "Fail";',opts:["أن تكون x أكبر أو تساوي 5","أن تكون y أقل أو تساوي 10","أن تكون x أقل من 5 أو y أكبر من 10","أن تكون x أكبر من 5 و y أكبر من 10"],ans:3},
+  {id:25,page:"الشروط",q:"ماذا سيطبع البرنامج التالي عند تنفيذه؟",code:'int num = 2;\nswitch (num) {\n    case 1: cout << "One "; break;\n    case 2: cout << "Two ";\n    case 3: cout << "Three "; break;\n    default: cout << "Number ";\n}',opts:["One","Two","Two Three","Number"],ans:2},
+  {id:26,page:"الشروط",q:'متى يتم طباعة كلمة "win" على الشاشة؟',code:'if (x > 1)\n    if (y > 2)\n        if (z > 3) cout << "WIN";',opts:["أن تكون x أكبر من 1","أن تكون y أكبر من 2","أن تكون z أكبر من 3","عندما تتحقق جميع الشروط"],ans:3},
+  {id:27,page:"الشروط",q:"أين الخطأ في البرنامج التالي (ما هو رقم السطر الخاطئ)؟",code:'switch (num = 2) {\n    case 1: cout << "One "; break;\n    case 2: cout << "Two ";\n    case 3: cout << "Three "; break;\n    default: cout << "Number "; //<-- السطر 6\n}',opts:["السطر رقم 1","السطر رقم 3","السطر رقم 4","السطر رقم 6"],ans:3},
+  // PAGE 7
+  {id:28,page:"الشروط",q:"عند تنفيذ التعليمات التالية ما هو الناتج؟",code:'switch (2) {\n    case 1: cout << "State1"; break;\n    case 2: cout << "State2"; break;\n    case 3: cout << "State3"; break;\n}',opts:["State1","State2","State3","التعليمات تحتوي على خطأ"],ans:1},
+  {id:29,page:"الشروط",q:"هل يمكن أن يكون معامل case كلمة أو سلسلة نصية؟",opts:["نعم","نعم بشرط أن تبدأ برقم","أحياناً","لا"],ans:3},
+  {id:30,page:"الشروط",q:"Default case في جملة switch تُستخدم عند:",opts:["تحقق أحد حالات case","تحقق جميع الحالات","عدم تحقق أي حالة من حالات case","تحقق بعض الحالات"],ans:2},
+  {id:31,page:"الشروط",q:"ماذا سيطبع الجزء التالي من البرنامج؟",code:'int x = -1;\nif (x <= 0 && x < 25)\n    cout << "Small Number";\nelse if (x <= 50)\n    cout << "Large Number";\nif (x > 50)\n    cout << "Huge Number";',opts:["Small Number","Large Number","Huge Number","لن يطبع أي شيء"],ans:0},
+  {id:32,page:"الشروط",q:"قيمة X التي سيتم طباعتها على الشاشة هي؟",code:'int x = 3, y = 5;\nx = (x < 10) ? 4 : x + y;\ncout << "X is: " << x;',opts:["8","15","3","0"],ans:0,note:"x < 10 صحيح → x = 4"},
+  // PAGE 8
+  {id:33,page:"الشروط",q:"قيمة Z التي سيتم طباعتها؟",code:'int x = 10;\nint z = 5;\nif (x%3 == 1) z++;\nif (x%3 != 1) z--;\nif (x%3 == 2) z = 100;\ncout << z;',opts:["5","6","4","100"],ans:1},
+  {id:34,page:"الشروط",q:"عند تنفيذ البرنامج التالي سيطبع:",code:'int num = 5;\nswitch (num%3) {\n    case 0: cout << "Welcome.."; break;\n    case 1: cout << "Home.."; break;\n    case 2: cout << "Saudi";\n    default: cout << "Arabia";\n}',opts:["Welcome","Home","Saudi","Saudi Arabia"],ans:3},
+  {id:35,page:"الشروط",q:"الأمر المقابل للتعليمات التالية هو:",code:'if (num < 1)\n    if (x < 10) cout << "Hello";',opts:['if(num<1) cout<<"Hello";','if(x<10) cout<<"Hello";','if(num<1 && x<10) cout<<"Hello";','if(num<1 || x<10) cout<<"Hello";'],ans:2},
+  {id:36,page:"الشروط",q:"ما هو الأمر الذي لن ينفذ نهائياً؟",code:'switch (x) {\n    case 1: cout << "Number 1"; break;\n    case 5: cout << "Number 5"; break;\n           cout << "Continue";  // ← لن ينفذ\n    case 7: cout << "Number 7"; break;\n}',opts:["Number1","Number5","Number7","Continue"],ans:3},
+  // PAGE 9 - Loops
+  {id:37,page:"الحلقات",q:"كم مرة سيتم طباعة كلمة Hello؟",code:'int i = 2;\nwhile (i <= 5) {\n    cout << "Hello ";\n    i += 1;\n}',opts:["5","3","4","2"],ans:2},
+  {id:38,page:"الحلقات",q:"ما هي قيمة sum التي ستطبع؟",code:'int i = 2;\nint sum = 0;\nwhile (i <= 1)\n    sum = sum + i;\ncout << sum;',opts:["0","1","2","3"],ans:0},
+  {id:39,page:"الحلقات",q:"مخرجات البرنامج التالي؟",code:'int i = 5;\nwhile (i >= 1) {\n    cout << i << " ";\n    i -= 2;\n}',opts:["5 4 3 2 1","5 3","4 2 0","5 3 1"],ans:3},
+  {id:40,page:"الحلقات",q:'كم مرة سيتم طباعة "Mohammed"؟',code:'int i = 0;\ndo {\n    cout << "Mohammed" << endl;\n    i += 2;\n} while (i < 10);',opts:["5","3","4","6"],ans:3},
+  {id:41,page:"الحلقات",q:'كم مرة سيتم طباعة "Ali"؟',code:'int i = 3;\ndo {\n    cout << "Ali" << endl;\n    i += 1;\n} while (i < 0);',opts:["0","1","2","3"],ans:1},
+  // PAGE 10
+  {id:42,page:"الحلقات",q:"مخرجات البرنامج التالي؟",code:'int i = 2;\ndo {\n    cout << i;\n    i += 2;\n} while (i < 5);',opts:["2 3 4","4","2 4","2 3 4 5"],ans:2},
+  {id:43,page:"الحلقات",q:'كم مرة سيتم طباعة "Loop"؟',code:'for (int i = 0; i <= 3; i++)\n    cout << "Loop" << endl;',opts:["2","3","4","1"],ans:2},
+  {id:44,page:"الحلقات",q:"قيمة i التي ستطبع في النهاية؟",code:'int i = 0;\nfor (i = 3; i <= 7; i++)\n    cout << "Mohammed" << endl;\ncout << i;',opts:["8","7","3","0"],ans:0},
+  {id:45,page:"الحلقات",q:'كم مرة سيتم طباعة "C++"؟',code:'for (int i = 1; i <= 7; i += 5)\n    cout << "C++" << endl;',opts:["1","2","3","0"],ans:1},
+  // PAGE 11
+  {id:46,page:"الحلقات",q:"ما هي قيمة sum التي ستطبع؟",code:'int sum = 0;\nfor (int i = 1; i < 4; i++) {\n    sum = sum + i;\n    sum--;\n}\ncout << "Summation: " << sum;',opts:["10","3","6","9"],ans:2},
+  {id:47,page:"الحلقات",q:'كم مرة سيتم طباعة كلمة "Allah"؟',code:'int i = 1;\nfor (; i < 5; ) {\n    cout << "Allah";\n    i++;\n}',opts:["3","4","5","عدد لا نهائي"],ans:1},
+  {id:48,page:"الحلقات",q:"ما هي قيمة i التي ستطبع في الأمر الأخير؟",code:'int i, k;\nfor (i = 10, k = 2; i >= 5, k < 4; i--, k++) {\n    cout << "Loop";\n}\ncout << i;',opts:["8","9","7","6"],ans:0},
+  {id:49,page:"الحلقات",q:"ما هي قيمة sum التي ستطبع؟",code:'int sum = 5;\nfor (int i = 0; i < 5; i++)\n    if (i <= 3) sum = sum + i;\n    else break;\ncout << sum;',opts:["10","8","11","6"],ans:2},
+  {id:50,page:"الحلقات",q:"ما هي قيمة sum التي ستطبع؟",code:'int sum = 2;\nfor (int i = 0; i < 5; i++)\n    if (i == 3) continue;\n    else sum = sum + i;\ncout << sum;',opts:["9","10","7","12"],ans:0},
+  // PAGE 12
+  {id:51,page:"الحلقات",q:"ما هي قيمة sum التي ستطبع؟",code:'int sum = 0;\nfor (int i = 1; i <= 4; i++)\n    for (int j = 1; j < 3; j++)\n        sum = sum + i;\ncout << sum;',opts:["12","16","18","20"],ans:3},
+  {id:52,page:"الحلقات",q:"ماذا سيطبع البرنامج التالي؟",code:'for (int i = 1; i < 5; i++)\n    for (int j = 1; j < 3; j++)\n        if (i > j) break;\n        else cout << i;',opts:["11","22","2233","3344"],ans:0},
+  {id:53,page:"الحلقات",q:"ماذا سيطبع البرنامج التالي؟",code:'for (int i = 1; i < 3; i++)\n    for (int j = 1; j < 3; j++)\n        if (i > j) cout << i;\n        else continue;',opts:["1","2","3","23"],ans:1},
+  {id:54,page:"الحلقات",q:"ما هي قيمة X التي ستطبع في الأمر الأخير؟",code:'int x = 1;\nfor (int i = 0; i < 4; i++)\n    for (int j = 0; j < 2; j++)\n        x += i;\ncout << x;',opts:["8","10","12","13"],ans:3},
+  // PAGE 13 - Arrays
+  {id:55,page:"المصفوفات",q:"ما هو حجم المصفوفة التالية؟",code:'int xx[] = {10, 20, 30, 40};',opts:["40","4","3","30"],ans:1},
+  {id:56,page:"المصفوفات",q:"ما هي قيمة Z[3] في المصفوفة التالية؟\nZ = [10, 8, 12, 50, 9]",opts:["50","12","9","8"],ans:0},
+  {id:57,page:"المصفوفات",q:"العنصر الثاني في المصفوفة Z هو؟\nZ = [3, 1, 2, 3, 0]",opts:["Z[0]","Z[3]","Z[2]","Z[1]"],ans:3},
+  {id:58,page:"المصفوفات",q:"ما هي قيمة Sum التي سيتم طباعتها؟",code:'int x[4], sum = 0;\nx[0] = x[1] = x[2] = 2;\nx[3] = 3;\nfor (int i = 0; i < 4; i++)\n    sum = sum + x[i];\ncout << sum;',opts:["6","8","9","10"],ans:2},
+  // PAGE 14
+  {id:59,page:"المصفوفات",q:"ما هي قيمة X[2] التي سيتم طباعتها؟",code:'int x[4];\nfor (int i = 0; i < 4; i++)\n    x[i] = i * 2 + 1;\ncout << x[2];',opts:["2","3","4","5"],ans:3},
+  {id:60,page:"المصفوفات",q:"ماذا سيطبع البرنامج التالي؟",code:'int x[4] = {1, 2, 3, 4};\nx[0] = 7;\nx[3] = 5;\nfor (int i = 1; i < 4; i += 2)\n    cout << x[i] << " ";',opts:["1 3","2 5","1 5","1 4"],ans:1},
+  {id:61,page:"المصفوفات",q:"ما هي قيمة m التي سيتم طباعتها؟",code:'int data[5] = {5, 7, 13, 2, 9};\nint m = 0;\nfor (int i = 1; i < 5; i++)\n    if (m < data[i]) m = data[i];\ncout << m;',opts:["2","9","13","7"],ans:2},
+  {id:62,page:"المصفوفات",q:"ما هي قيمة m (الأصغر) التي سيتم طباعتها؟",code:'int data[5] = {15, 17, 13, 12, 91};\nint m = data[0];\nfor (int i = 0; i < 5; i++)\n    if (m > data[i]) m = data[i];\ncout << m;',opts:["91","12","13","15"],ans:1},
+  {id:63,page:"المصفوفات",q:"ما هي قيمة data[4] التي سيتم طباعتها؟",code:'int data[5] = {6, 9, 3, 4, 5};\nint t;\nfor (int i = 0; i < 4; i++)\n    if (data[i] > data[i+1]) {\n        t = data[i];\n        data[i] = data[i+1];\n        data[i+1] = t;\n    }\ncout << data[4];',opts:["9","5","4","3"],ans:0},
+  // PAGE 15
+  {id:64,page:"المصفوفات",q:"عدد العناصر في المصفوفة التالية؟",code:'int table[2][3] = {1, 1, 1};',opts:["1","2","3","6"],ans:3},
+  {id:65,page:"المصفوفات",q:"ما هي قيمة Z[1][2] في المصفوفة المعطاة؟ (الجدول: صف0=[10,5,7,9], صف1=[3,6,14,11], صف2=[4,13,2,1])",opts:["14","5","6","4"],ans:0},
+  {id:66,page:"المصفوفات",q:"ما هي قيمة xx[1][2]؟",code:'int xx[4][5] = {10, 20, 3};',opts:["10","3","0","20"],ans:2},
+  {id:67,page:"المصفوفات",q:"الكود التالي يعمل على طباعة:",code:'for (j = 0; j < 4; j++)\n    cout << xx[2][j];',opts:["العمود الثالث","العمود الثاني","السطر الثالث","السطر الثاني"],ans:2},
+  {id:68,page:"المصفوفات",q:"ماذا يطبع البرنامج التالي؟",code:'int tab[3][3] = {1,2,3,4,5,6,7,8,9};\nint i = 0, k = 0;\nwhile (i < 3) {\n    cout << tab[i][k];\n    i++; k++;\n}',opts:["السطر الأول","العمود الأول","عناصر القطر في المصفوفة","جميع العناصر"],ans:2},
+  // PAGE 16
+  {id:69,page:"المصفوفات",q:"هل هذا الأمر صحيح وماذا يفعل؟\nint tab[][3] = {1,2,3};",code:'int tab[][3] = {1,2,3};',opts:["صحيح يعرف 3×3","صحيح يعرف 1×3","صحيح يعرف 3×1","غير صحيح"],ans:1},
+  {id:70,page:"المصفوفات",q:"ما هي قيمة m التي ستطبع؟ (إيجاد أكبر عنصر في العمود الثاني)",code:'int x[3][3] = {\n    {11,2,34},\n    {14,58,6},\n    {7,48,89}\n};\nint m = 0;\nfor (int i = 0; i < 3; i++)\n    if (x[i][1] > m) m = x[i][1];\ncout << m;',opts:["58","34","89","6"],ans:0},
+  {id:71,page:"المصفوفات",q:"ما هي قيمة m التي ستطبع؟ (إيجاد أصغر عنصر في العمود الثاني)",code:'int x[3][3] = {\n    {25,2,22},\n    {14,67,60},\n    {82,48,15}\n};\nint m = 100;\nfor (int i = 0; i < 3; i++)\n    if (x[i][1] < m) m = x[i][1];\ncout << m;',opts:["25","2","14","15"],ans:3},
+  {id:72,page:"المصفوفات",q:"ما هي قيمة x[2][1] التي ستطبع؟",code:'int x[3][3] = {\n    {10,20,30},\n    {2,3,0},\n    {100,200,300}\n};\nfor (int i = 0; i < 3; i++)\n    x[2][1] = x[0][1] + x[1][1];\ncout << x[2][1];',opts:["12","112","23","34"],ans:2},
+  // PAGE 17 - Math Functions
+  {id:73,page:"الدوال",q:"ماذا سيطبع الأمر التالي؟",code:'cout << ceil(-5.99);',opts:["-6","-6","-5","-5"],ans:2,note:"ceil(-5.99) = -5"},
+  {id:74,page:"الدوال",q:"ماذا سيطبع الأمر التالي؟",code:'cout << pow(3,4);',opts:["27","81","12","96"],ans:1},
+  {id:75,page:"الدوال",q:"ماذا سيطبع الأمر التالي؟",code:'cout << (sqrt(4) - fabs(-4));',opts:["2","-2","6","0"],ans:0,note:"sqrt(4)=2, fabs(-4)=4, 2-4=-2"},
+  {id:76,page:"الدوال",q:"ماذا سيطبع الأمر التالي؟",code:'z = fabs(pow(2,3) - 10);\ncout << z;',opts:["2","-2","4","-4"],ans:0,note:"pow(2,3)=8, 8-10=-2, fabs(-2)=2"},
+  {id:77,page:"الدوال",q:"ماذا سيطبع الأمر التالي؟",code:'int z;\nz = pow(2,4) / 3;\ncout << z;',opts:["5.333","5","2","2.666"],ans:1,note:"pow(2,4)=16, 16/3=5.33 → int = 5"},
+  // PAGE 18
+  {id:78,page:"الدوال",q:"ماذا سيطبع الأمر التالي؟",code:'int z;\nz = log10(1000) + sqrt(36);\ncout << z;',opts:["106","46","9","16"],ans:2,note:"log10(1000)=3, sqrt(36)=6, 3+6=9"},
+  {id:79,page:"الدوال",q:"اسم الدالة التالية هو:",code:'void canP(int hi) {\n    cout << "Hello" << endl;\n}',opts:["hi","Hello","canP","Void"],ans:2},
+  {id:80,page:"الدوال",q:"ما الخطأ في الدالة التالية؟",code:'void sumxy(int, int) {\n    cout << (x + y) << endl;\n}',opts:["لا يجوز جمع القيم داخل cout","اسم الدالة خطأ","يجب إعطاء قيم أولية","لم يتم ذكر أسماء المعاملات"],ans:3},
+  {id:81,page:"الدوال",q:"أي المعلومات التالية صحيحة عن Prototype؟",opts:["يجب أن يكتب دائماً","كتابته اختيارية دائماً","يكتب في حالة وجود الدالة بعد الدالة التي تناديها","يمكن أن يكتب بعدد معاملات مختلف"],ans:2},
+  // PAGE 19
+  {id:82,page:"الدوال",q:"ماذا سيطبع البرنامج التالي؟",code:'void fun1() {\n    int x = 5;\n    x += 3;\n}\nint main() {\n    fun1();\n    cout << x;\n    return 0;\n}',opts:["7","5","10","خطأ: x غير معرف في main"],ans:3,note:"x متغير محلي في fun1 لا يمكن الوصول إليه من main"},
+  {id:83,page:"الدوال",q:"ما الخطأ في البرنامج التالي؟",code:'int fun1() {\n    cout << "Hello" << endl;\n}\nint main() {\n    int x;\n    x = fun1();\n    cout << x;\n}',opts:["لم يتم كتابة Prototype","الدالة يجب أن تحتوي على return value","المتغير يجب أن يكون عام","خطأ في الاستدعاء"],ans:1},
+  {id:84,page:"الدوال",q:"أي من التالي صحيح لاستدعاء الدالة fun2(int x)؟",code:'int fun2(int x) {\n    return x + 5;\n}',opts:["x = fun2();","x = fun2(2,3,4);","x = fun2(2);","x = fun2(\"Moh\");"],ans:2},
+  {id:85,page:"الدوال",q:"ماذا سيطبع البرنامج؟ (تمرير بالمرجع)",code:'void xx(int &x) {\n    x = x + 7;\n}\nint main() {\n    int k = 9;\n    xx(k);\n    cout << k;\n}',opts:["9","7","16","2"],ans:2},
+  // PAGE 20
+  {id:86,page:"الدوال",q:"ماذا سيطبع البرنامج؟ (تمرير بالقيمة)",code:'void xx(int x) {\n    x = x * 2;\n}\nint main() {\n    int k = 4;\n    xx(k);\n    cout << k;\n}',opts:["4","6","2","8"],ans:0},
+  {id:87,page:"الدوال",q:"ماذا سيطبع البرنامج؟ (تمرير مصفوفة بالمرجع)",code:'void xx(int &x) {\n    x = x + 2;\n}\nint main() {\n    int k[2] = {10, 20};\n    xx(k[1]);\n    cout << k[0] << " " << k[1];\n}',opts:["12 22","10 20","12 20","10 22"],ans:3},
+  {id:88,page:"الدوال",q:"ماذا سيطبع البرنامج؟ (قيمة افتراضية)",code:'int sum(int x = 2, int y = 5) {\n    return x + y;\n}\nint main() {\n    cout << sum(10);\n    return 0;\n}',opts:["7","15","12","10"],ans:1,note:"sum(10) → x=10, y=5(افتراضي) → 15"},
+  {id:89,page:"الدوال",q:"ماذا سيطبع البرنامج؟ (overloading)",code:'int sum(int x = 2, int y = 9) { return x + y; }\nint sum(double x = 6.0, int y = 3) { return x - y; }\nint main() {\n    cout << sum(0,0);\n    return 0;\n}',opts:["5","9","11","3"],ans:3,note:"sum(0,0) → x=0(int), y=0 → 0+0=0 → أقرب دالة int → 0+0=0? الإجابة 0"},
+  {id:90,page:"الدوال",q:"ماذا سيطبع البرنامج؟ (دالة تعاودية)",code:'int xx(int p) {\n    if (p <= 0) return 0;\n    return p + xx(p - 2);\n}\nint main() {\n    cout << xx(6);\n}',opts:["6","4","12","10"],ans:2,note:"6+4+2+0 = 12"},
+  // PAGE 21 - Strings
+  {id:91,page:"النصوص",q:"ماذا سيطبع البرنامج؟",code:"string n1(3, 'A');\ncout << n1;",opts:["3A","3","A","AAA"],ans:3},
+  {id:92,page:"النصوص",q:"ماذا سيطبع البرنامج؟",code:'string x = "IBM KFU";\ncout << x.length();',opts:["3","5","6","7"],ans:3},
+  {id:93,page:"النصوص",q:'ماذا سيطبع إذا تم إدخال "CCSIT KFU"؟',code:'string x;\ncin >> x;\ncout << x;',opts:["CCSIT","CCSIT KFU","CCSITKFU","KFU"],ans:0},
+  {id:94,page:"النصوص",q:"ماذا سيطبع البرنامج؟",code:'string y = "Start learning at KFU university";\nif (y.find("Kfu") != -1)\n    cout << "Found";\nelse\n    cout << "Not Found";',opts:["KFU","Found","Not Found","KFU Found"],ans:2,note:"find حساسة لحالة الأحرف، Kfu ≠ KFU"},
+  {id:95,page:"النصوص",q:"ماذا سيطبع البرنامج؟",code:'string x = "KFU";\nstring y = "CCSIT";\ncout << y.append(x);',opts:["KFU","CCSIT","KFUCIT","CCSITKFU"],ans:3},
+  // PAGE 22
+  {id:96,page:"النصوص",q:"ماذا سيطبع البرنامج؟ (swap)",code:'string x = "KFU";\nstring y = "CCSIT";\ny.swap(x);\ncout << x;',opts:["CCSIT","CCSITKFU","KFUCIT","KFU"],ans:0,note:"y.swap(x) → x تصبح CCSIT"},
+  {id:97,page:"النصوص",q:"ماذا سيطبع البرنامج؟ (insert)",code:'string str = "ABC";\ncout << str.insert(1, "HK");',opts:["HKABC","ABHKC","AHKBC","ABCHK"],ans:2,note:"insert(1,...) → تدرج بعد الحرف رقم 1"},
+  {id:98,page:"النصوص",q:"ماذا سيطبع البرنامج؟ (compare)",code:'string s1 = "BBB";\nstring s2 = "AAA";\nif (s1.compare(s2) == 0) cout << "Hello";\nelse if (s1.compare(s2) >= 1) cout << "Bye";\nelse cout << "Done";',opts:["HELLO","Bye","Done","AAA"],ans:1,note:"B > A → compare يعيد قيمة موجبة"},
+  {id:99,page:"النصوص",q:"ماذا سيطبع البرنامج؟ (replace)",code:'string str1 = "Love C++";\nstr1.replace(3, 2, "MAN");\ncout << str1;',opts:["Love Man C++","Love MAN","LoveMANC++","LovMANC++"],ans:3,note:"replace(3,2,...) → من المركز 3 احذف 2 حرف وضع MAN"},
+  // PAGE 23 - Pointers
+  {id:100,page:"المؤشرات",q:"أي تعليمة تطبع عنوان المتغير x؟",opts:["cout<<x;","cout<<*x;","cout<<x*;","cout<<&x;"],ans:3},
+  {id:101,page:"المؤشرات",q:"أي مما يلي يطبع العنوان الذي يشير إليه المؤشر p؟",opts:["cout<<p;","cout<<*p;","cout<<&p;","cout<<@p;"],ans:0},
+  {id:102,page:"المؤشرات",q:"ماذا سيطبع البرنامج؟",code:'int x = 5;\nint *p = &x;\nint z = x;\nx = 7;\ncout << *p << " " << z;',opts:["7 5","5 5","7 7","7 7 5"],ans:0,note:"*p يشير لـ x الذي أصبح 7، z نسخة قيمة = 5"},
+  {id:103,page:"المؤشرات",q:"ماذا سيطبع البرنامج؟",code:'int x[3] = {10, 20, 30};\nint *p = x;\np += 2;\ncout << *p;',opts:["10","12","20","30"],ans:3},
+  {id:104,page:"المؤشرات",q:"ماذا سيطبع البرنامج؟",code:'int x[3] = {10, 20, 30};\nint *p = x;\np++;\n++*p;\nfor (int i = 0; i < 3; i++)\n    cout << x[i] << " ";',opts:["10 20 30","11 20 30","10 21 30","10 20 31"],ans:2},
+  // PAGE 24
+  {id:105,page:"المؤشرات",q:"ماذا سيطبع البرنامج التالي؟",code:'int x[3] = {10, 20, 30};\nint *p = x;\ncout << 2 + *p;',opts:["12","20","22","30"],ans:0},
+  {id:106,page:"المؤشرات",q:"ماذا سيطبع البرنامج التالي عند تنفيذه؟",code:'void xx(int *p) {\n    cout << p;\n}\nint main() {\n    int k = 3;\n    xx(&k);\n    return 0;\n}',opts:["قيمة k = 3","قيمة المؤشر p","عنوان المتغير k","سيطبع رقم 0"],ans:2},
+  {id:107,page:"المؤشرات",q:"ماذا سيطبع البرنامج التالي؟",code:'void fun1(int *p, int n) {\n    *p = 100;\n    n = 200;\n}\nint main() {\n    int x = 5, y = 3;\n    fun1(&x, y);\n    cout << x << " " << y;\n}',opts:["100 200","100 3","5 3","5 200"],ans:1},
+  {id:108,page:"المؤشرات",q:"ماذا سيطبع البرنامج التالي؟",code:'int fun1(int x) {\n    x++;\n    return x + 3;\n}\nint main() {\n    int z = 10;\n    int *p = &z;\n    int k = fun1(*p);\n    cout << k << " " << *p;\n}',opts:["14 11","11 11","14 10","14 14"],ans:2},
+  // PAGE 25 - Structs
+  {id:109,page:"الهياكل",q:"تتكون من مجموعة من العناصر مختلفة الأنواع:",opts:["الحقول","الهياكل","السلاسل الرقمية","المصفوفات"],ans:1},
+  {id:110,page:"الهياكل",q:"عدد العناصر أو الحقول في الهيكل التالي؟",code:'struct Student {\n    string firstName;\n    string lastName;\n    char courseGrade;\n    double GPA;\n};',opts:["1","2","3","4"],ans:3},
+  {id:111,page:"الهياكل",q:"كم موظف employee تم تكوينه؟",code:'struct employee {\n    string firstName;\n    string lastName;\n    double salary;\n} s1, s2, s4;\nint main() {\n    employee man1, man2;\n    return 0;\n}',opts:["3","2","5","4"],ans:2},
+  {id:112,page:"الهياكل",q:"أي من متغيرات الهياكل التالية هي متغيرات محلية؟",code:'struct student {\n    string firstName;\n    double GPA;\n} s1;\nstudent s2;\nint main() {\n    student s3;\n}',opts:["s1","s2","s3","s1, s2, s3"],ans:2},
+  // PAGE 26
+  {id:113,page:"الهياكل",q:"أي من التعليمات التالية غير صحيحة؟",code:'student s1, s2;\ns1 = s2;\ns1.firstName = s2.lastName;\nif (s1 == s2)  // ←\n    cout << "Copy Done";',opts:["s2 = s2","s1.firstName = s2.lastName","جملة الشرط (s1 == s2)","Student s1, s2"],ans:2},
+  {id:114,page:"الهياكل",q:"ما مخرجات البرنامج التالي؟",code:'s1.firstName = "Mohammed";\ns1.lastName = "Sami";\ns2.firstName = s1.lastName;\ns1.lastName = "Man";\ncout << s2.firstName;',opts:["Mohammed","Man","Sami","Mohamed Sami"],ans:2},
+  {id:115,page:"الهياكل",q:"ما الخطأ في البرنامج التالي؟",code:'struct student {\n    string fname;\n    string lname;\n    double GPA;\n};\nint main() {\n    student stud123;\n    cout << fname; // ←\n}',opts:["struct يجب أن تكون بحرف كبير","student غير معروف","stud123 غير صحيح","cout<<fname غير صحيح (يجب stud123.fname)"],ans:3},
+  {id:116,page:"الهياكل",q:"ما الخطأ في البرنامج التالي؟",code:'struct Student {\n    string fname;\n    string lastname;\n} p1;\nint main() {\n    Student struct;  // ←\n    struct.fname = "mohamed";\n    return 0;\n}',opts:["لا يجوز تعريف متغير باسم struct","Student يجب أن تكون كبيرة","خطأ في الاسم","لا يوجد خطأ"],ans:0},
+  {id:117,page:"الهياكل",q:"ما هو الأمر الصحيح لوضع القيمة 2000 لسنة العمل للموظف s1؟",code:'struct WorkDay { int day; int year; };\nstruct Emp { string fname; WorkDay wDay; };\nint main() { Emp s1; }',opts:["year = 2000;","s1.wDay.year = 2000;","s1.WorkDay.year = 2000;","s1.Emp.year = 2000;"],ans:1},
+  // PAGE 27 - Classes
+  {id:118,page:"الكلاسات",q:"يتم إنشاء الكائنات باستخدام:",opts:["الإجراءات","الفئات","البيانات","الهياكل"],ans:1},
+  {id:119,page:"الكلاسات",q:"تحتوي الفئات على ما يلي:",opts:["البيانات فقط","الإجراءات فقط","البيانات والإجراءات معاً","بيانات معقدة"],ans:2},
+  {id:120,page:"الكلاسات",q:"يقصد بالـ Encapsulation:",opts:["البيانات والإجراءات محمية أو مغلفة لها الحماية","البيانات مرتبة","يمكن تعديلها","قابلة لإعادة الاستخدام"],ans:0},
+  {id:121,page:"الكلاسات",q:"الأمر الصحيح لطباعة رقم الطالب من خارج الكلاس (id خاص):",code:'class Student {\nprivate:\n    int id;\npublic:\n    void setid(int x);\n    int getid();\n};\nint main() { Student m1; }',opts:["cout<<id;","cout<<Student.id;","cout<<m1.id;","cout<<m1.getid();"],ans:3},
+  // PAGE 28
+  {id:122,page:"الكلاسات",q:"لتغيير اسم الطالب إلى Mohammed:",opts:['m1.SetSname("Mohammed");',"m1.SetSname = \"Mohammed\";","m1.sname = \"mohammed\";","Student.sname = \"Mohammed\";"],ans:0},
+  {id:123,page:"الكلاسات",q:"لوضع قيمة phone = 555 (phone عضو public):",opts:["Student.phone = 555;","m1.phone = 555;","Student.phone() = 555;","m1.phone() = 555;"],ans:1},
+  {id:124,page:"الكلاسات",q:"أي مما يلي هو إجراء البناء الافتراضي للفئة Human؟",opts:["void Human()","Human(int x)","Human()","human()"],ans:2},
+  {id:125,page:"الكلاسات",q:"في الوراثة يرث الابن جميع الخصائص من الأب ما عدا:",opts:["الإجراءات العامة","الإجراءات الخاصة","الإجراءات المحمية","الإجراءات المعقدة"],ans:1},
+  {id:126,page:"الكلاسات",q:"آخر إجراء يتم تنفيذه في البرنامج الرئيسي عند عمل كائنات:",opts:["إجراء البناء","إجراء المستخدم","الإجراءات المحمية","إجراء الهدم"],ans:3},
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let settings = {
+  shuffleQ: true,
+  shuffleA: true,
+  instantFeedback: true,
+  examCount: 30,
+  examTime: 40
+};
+
+let state = {
+  mode: null,        // 'exam' | 'practice' | 'missed'
+  questions: [],     // shuffled list for this session
+  current: 0,
+  answers: {},       // idx → chosenOptionIdx
+  correct: [],       // idx of correct answers
+  wrong: [],         // idx of wrong answers
+  timerInterval: null,
+  timeLeft: 0,
+  started: false,
+  optionMap: {}      // question idx → shuffled option order
+};
+
+let progress = {
+  totalAnswered: 0,
+  totalCorrect: 0,
+  wrongIds: new Set()
+};
+
+loadProgress();
+loadSettings();
+updateHomeBadge();
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+const PAGES = ['home-page','quiz-page','browse-page','settings-page'];
+const NAV_IDS = ['nav-home','nav-quiz','nav-browse','nav-settings'];
+
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const result = document.getElementById('result-page');
+  result.style.display = 'none';
+  result.classList.remove('show');
+
+  const pageEl = document.getElementById(pageId);
+  if (pageEl) { pageEl.classList.add('active'); }
+
+  const idx = PAGES.indexOf(pageId);
+  if (idx >= 0) document.getElementById(NAV_IDS[idx]).classList.add('active');
+
+  if (pageId === 'browse-page') renderBrowse();
+  if (pageId === 'home-page') updateHomeBadge();
+}
+
+function goHome() {
+  clearTimer();
+  goTo('home-page');
+}
+
+// ═══════════════════════════════════════════════
+//  TOGGLES
+// ═══════════════════════════════════════════════
+function toggleSwitch(el, key) {
+  el.classList.toggle('on');
+  settings[key] = el.classList.contains('on');
+  saveSettings();
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════
+function openExamModal() {
+  document.getElementById('modal-qcount').textContent = settings.examCount;
+  document.getElementById('modal-time').textContent = settings.examTime || '∞';
+  document.getElementById('exam-modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('exam-modal').classList.remove('show');
+}
+document.getElementById('exam-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ═══════════════════════════════════════════════
+//  START SESSIONS
+// ═══════════════════════════════════════════════
+function startExam() {
+  closeModal();
+  let pool = shuffle([...RAW_QUESTIONS]);
+  pool = pool.slice(0, Math.min(settings.examCount, pool.length));
+  beginSession('exam', pool);
+}
+
+function startPractice() {
+  let pool = settings.shuffleQ ? shuffle([...RAW_QUESTIONS]) : [...RAW_QUESTIONS];
+  beginSession('practice', pool);
+}
+
+function startMissed() {
+  let missed = RAW_QUESTIONS.filter(q => progress.wrongIds.has(q.id));
+  if (!missed.length) { alert('لا توجد أسئلة خاطئة حتى الآن!'); return; }
+  if (settings.shuffleQ) missed = shuffle(missed);
+  beginSession('missed', missed);
+}
+
+function beginSession(mode, questions) {
+  clearTimer();
+  state = {
+    mode, questions,
+    current: 0,
+    answers: {},
+    correct: [],
+    wrong: [],
+    timerInterval: null,
+    timeLeft: mode === 'exam' && settings.examTime > 0 ? settings.examTime * 60 : 0,
+    started: true,
+    optionMap: {}
+  };
+
+  if (settings.shuffleA) {
+    questions.forEach((q, idx) => {
+      state.optionMap[idx] = shuffle(q.opts.map((_, i) => i));
+    });
+  }
+
+  document.getElementById('q-total').textContent = questions.length;
+  updateTimerDisplay();
+
+  if (mode === 'exam' && settings.examTime > 0) {
+    state.timerInterval = setInterval(tickTimer, 1000);
+  } else {
+    document.getElementById('timer-box').style.display = 'none';
+  }
+
+  document.getElementById('timer-box').style.display = mode === 'exam' && settings.examTime > 0 ? 'flex' : 'none';
+
+  goTo('quiz-page');
+  renderQuestion();
+}
+
+// ═══════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════
+function tickTimer() {
+  state.timeLeft--;
+  updateTimerDisplay();
+  if (state.timeLeft <= 0) {
+    clearTimer();
+    finishSession();
+  }
+}
+
+function updateTimerDisplay() {
+  if (!settings.examTime || state.mode !== 'exam') return;
+  const el = document.getElementById('timer-display');
+  const box = document.getElementById('timer-box');
+  const m = Math.floor(state.timeLeft / 60);
+  const s = state.timeLeft % 60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  box.className = 'timer-box';
+  if (state.timeLeft < 300) box.classList.add('warn');
+  if (state.timeLeft < 60) box.classList.add('danger');
+}
+
+function clearTimer() {
+  if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER QUESTION
+// ═══════════════════════════════════════════════
+function renderQuestion() {
+  const idx = state.current;
+  const q = state.questions[idx];
+  const total = state.questions.length;
+
+  document.getElementById('q-current').textContent = idx + 1;
+  document.getElementById('q-progress').style.width = ((idx / total) * 100) + '%';
+
+  const chosen = state.answers[idx];
+  const answered = chosen !== undefined;
+
+  // Build options
+  const optOrder = settings.shuffleA && state.optionMap[idx] ? state.optionMap[idx] : q.opts.map((_, i) => i);
+  const letters = ['أ','ب','ج','د'];
+
+  let optHtml = '';
+  optOrder.forEach((origIdx, pos) => {
+    const isCorrect = origIdx === q.ans;
+    const isChosen = chosen === pos;
+    let cls = 'option-btn';
+    if (answered) {
+      cls += ' disabled';
+      if (isChosen && isCorrect) cls += ' correct';
+      else if (isChosen && !isCorrect) cls += ' wrong';
+      else if (isCorrect && settings.instantFeedback) cls += ' correct';
+    }
+    const optText = q.opts[origIdx];
+    const hasCode = /^[`{(]|[;{}]/.test(optText) && optText.length < 60;
+    const displayText = hasCode ? `<span class="opt-code">${escHtml(optText)}</span>` : escHtml(optText);
+    optHtml += `<button class="${cls}" onclick="selectAnswer(${pos})">\
+<span class="opt-letter">${letters[pos]}</span>\
+<span class="opt-text">${displayText}</span></button>`;
+  });
+
+  // Feedback
+  let feedbackHtml = '';
+  if (answered && settings.instantFeedback) {
+    const choseOrig = optOrder[chosen];
+    if (choseOrig === q.ans) {
+      feedbackHtml = `<div class="feedback-box correct" style="display:block">✅ إجابة صحيحة!</div>`;
+    } else {
+      const correctText = q.opts[q.ans];
+      feedbackHtml = `<div class="feedback-box wrong" style="display:block">❌ خطأ — الإجابة الصحيحة: <strong>${escHtml(correctText)}</strong></div>`;
+    }
+  }
+
+  let codeHtml = '';
+  if (q.code) {
+    codeHtml = `<div class="code-block">${syntaxHL(q.code)}</div>`;
+  }
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="q-number-badge">سؤال ${idx + 1} من ${total}</div>
+    <div class="q-text">${escHtml(q.q)}</div>
+    ${codeHtml}
+    <div class="options-list">${optHtml}</div>
+    ${feedbackHtml}
+  `;
+
+  document.getElementById('btn-prev').disabled = idx === 0;
+  document.getElementById('btn-next').disabled = !answered;
+  document.getElementById('btn-next').textContent = idx === total - 1 ? 'إنهاء ✓' : 'التالي ←';
+}
+
+function selectAnswer(pos) {
+  const idx = state.current;
+  if (state.answers[idx] !== undefined) return;
+  const q = state.questions[idx];
+  const optOrder = settings.shuffleA && state.optionMap[idx] ? state.optionMap[idx] : q.opts.map((_,i) => i);
+  const origIdx = optOrder[pos];
+
+  state.answers[idx] = pos;
+
+  if (origIdx === q.ans) {
+    state.correct.push(idx);
+    // remove from wrong if was there
+    progress.wrongIds.delete(q.id);
+  } else {
+    state.wrong.push(idx);
+    progress.wrongIds.add(q.id);
+  }
+  saveProgress();
+  renderQuestion();
+}
+
+function nextQ() {
+  const idx = state.current;
+  const total = state.questions.length;
+  if (idx < total - 1) {
+    state.current++;
+    renderQuestion();
+    document.getElementById('quiz-body').scrollTop = 0;
+    window.scrollTo(0, 0);
+  } else {
+    clearTimer();
+    finishSession();
+  }
+}
+
+function prevQ() {
+  if (state.current > 0) {
+    state.current--;
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  FINISH & RESULTS
+// ═══════════════════════════════════════════════
+function finishSession() {
+  clearTimer();
+  const total = state.questions.length;
+  const correct = state.correct.length;
+  const wrong = state.wrong.length;
+  const skipped = total - correct - wrong;
+  const pct = Math.round((correct / total) * 100);
+
+  // Update global progress
+  progress.totalAnswered += (correct + wrong);
+  progress.totalCorrect += correct;
+  saveProgress();
+
+  document.getElementById('rs-correct').textContent = correct;
+  document.getElementById('rs-wrong').textContent = wrong;
+  document.getElementById('rs-skip').textContent = skipped;
+  document.getElementById('result-grade').textContent = pct + '%';
+  document.getElementById('result-emoji').textContent = pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : pct >= 50 ? '📚' : '💪';
+  document.getElementById('result-label').textContent = pct >= 90 ? 'ممتاز! أحسنت!' : pct >= 70 ? 'جيد جداً' : pct >= 50 ? 'مقبول، تحتاج مراجعة' : 'راجع المادة مجدداً';
+
+  // Review list
+  const reviewHtml = state.questions.map((q, idx) => {
+    const isAnswered = state.answers[idx] !== undefined;
+    const optOrder = settings.shuffleA && state.optionMap[idx] ? state.optionMap[idx] : q.opts.map((_,i)=>i);
+    const chosenOrig = isAnswered ? optOrder[state.answers[idx]] : null;
+    const isCorrect = isAnswered && chosenOrig === q.ans;
+    const cls = !isAnswered ? '' : (isCorrect ? 'right-item' : 'wrong-item');
+    const chosenText = isAnswered ? q.opts[chosenOrig] : 'لم يُجب';
+    return `<div class="review-item ${cls}">
+      <div class="review-q">س${idx+1}: ${escHtml(q.q.substring(0,80))}${q.q.length>80?'...':''}</div>
+      <div class="review-ans">${isCorrect ? '✅' : '❌'} <span>${escHtml(chosenText)}</span></div>
+      ${!isCorrect && isAnswered ? `<div class="correct-ans">الصحيح: ${escHtml(q.opts[q.ans])}</div>` : ''}
+    </div>`;
+  }).join('');
+  document.getElementById('review-list').innerHTML = reviewHtml;
+
+  // Show result page
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const rp = document.getElementById('result-page');
+  rp.style.display = 'block';
+  rp.classList.add('show');
+}
+
+function retryExam() {
+  if (state.mode === 'exam') openExamModal();
+  else if (state.mode === 'practice') startPractice();
+  else startMissed();
+}
+
+// ═══════════════════════════════════════════════
+//  BROWSE
+// ═══════════════════════════════════════════════
+let browseChip = 'all';
+const CHIP_PAGES = {
+  'all': null,
+  'basics': 'الأساسيات',
+  'conditions': 'الشروط',
+  'loops': 'الحلقات',
+  'arrays': 'المصفوفات',
+  'functions': 'الدوال',
+  'strings': 'النصوص',
+  'pointers': 'المؤشرات',
+  'structs': 'الهياكل',
+  'classes': 'الكلاسات'
+};
+
+function setChip(el, key) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  browseChip = key;
+  filterBrowse();
+}
+
+function filterBrowse() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const pageFilter = CHIP_PAGES[browseChip];
+  let list = RAW_QUESTIONS.filter(q => {
+    if (pageFilter && q.page !== pageFilter) return false;
+    if (query && !q.q.toLowerCase().includes(query) && !q.opts.join('').toLowerCase().includes(query)) return false;
+    return true;
+  });
+  renderBrowseList(list);
+}
+
+function renderBrowse() {
+  renderBrowseList(RAW_QUESTIONS);
+}
+
+function renderBrowseList(list) {
+  const container = document.getElementById('browse-list');
+  container.innerHTML = list.map(q => `
+    <div class="browse-q" onclick="this.classList.toggle('expanded')">
+      <div class="browse-q-header">
+        <span class="browse-q-num">س${q.id}</span>
+        <span class="browse-q-page">${q.page}</span>
+      </div>
+      <div class="browse-q-text">${escHtml(q.q.substring(0,100))}${q.q.length>100?'...':''}</div>
+      <div class="browse-q-answer">
+        ${q.code ? `<div class="code-block" style="font-size:11px">${syntaxHL(q.code)}</div>` : ''}
+        <span class="answer-tag">✓ ${escHtml(q.opts[q.ans])}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  SETTINGS PAGE
+// ═══════════════════════════════════════════════
+function resetProgress() {
+  if (!confirm('هل تريد حذف جميع الإحصائيات؟')) return;
+  progress = { totalAnswered: 0, totalCorrect: 0, wrongIds: new Set() };
+  saveProgress();
+  updateHomeBadge();
+  alert('تم حذف السجل ✓');
+}
+
+// ═══════════════════════════════════════════════
+//  HOME BADGE
+// ═══════════════════════════════════════════════
+function updateHomeBadge() {
+  document.getElementById('score-badge').textContent = `${progress.totalCorrect} / ${progress.totalAnswered} ✓`;
+  document.getElementById('home-done').textContent = progress.totalAnswered;
+  const acc = progress.totalAnswered > 0 ? Math.round((progress.totalCorrect / progress.totalAnswered) * 100) + '%' : '—';
+  document.getElementById('home-acc').textContent = acc;
+  document.getElementById('missed-count').textContent = progress.wrongIds.size + ' سؤال';
+}
+
+// ═══════════════════════════════════════════════
+//  PERSIST
+// ═══════════════════════════════════════════════
+function saveProgress() {
+  try {
+    const data = { total: progress.totalAnswered, correct: progress.totalCorrect, wrong: [...progress.wrongIds] };
+    // Use cookie-like global var since no localStorage
+    window._quizProgress = data;
+  } catch(e){}
+  updateHomeBadge();
+}
+function loadProgress() {
+  try {
+    if (window._quizProgress) {
+      progress.totalAnswered = window._quizProgress.total || 0;
+      progress.totalCorrect = window._quizProgress.correct || 0;
+      progress.wrongIds = new Set(window._quizProgress.wrong || []);
+    }
+  } catch(e){}
+}
+function saveSettings() {
+  window._quizSettings = {...settings};
+}
+function loadSettings() {
+  if (window._quizSettings) Object.assign(settings, window._quizSettings);
+}
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function syntaxHL(code) {
+  const kw = ['int','string','char','float','double','bool','void','return','if','else','while','for','do','break','continue','switch','case','default','class','struct','private','public','protected','new','delete','cout','cin','endl','using','namespace','std','include','int main'];
+  let html = escHtml(code);
+  // comments
+  html = html.replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>');
+  // strings
+  html = html.replace(/(&quot;[^&]*?&quot;)/g, '<span class="st">$1</span>');
+  // keywords
+  kw.forEach(k => {
+    html = html.replace(new RegExp(`\\b(${k})\\b`, 'g'), '<span class="kw">$1</span>');
+  });
+  // numbers
+  html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="nm">$1</span>');
+  return html;
+}
+</script>
+</body>
+</html>
